@@ -5,7 +5,7 @@
       <el-col :span="14">
         <el-card style="min-height: 60vh; text-align: center;">
           <el-input v-model="searchInput"
-                    style="width: 700px; height: 50px; font-size: 18px; margin: 20px;"
+                    style="width: 800px; height: 50px; font-size: 18px; margin: 20px;"
                     placeholder="搜索内容">
             <template #suffix>
               <el-button type="text" @click="do_search">
@@ -20,6 +20,9 @@
               </el-button>
             </template>
           </el-input>
+          <div style="width: 800px; margin-left: auto; margin-right: auto;">
+            <el-alert style="margin: 0 0;" v-if="searchInput" title="查询用时:0.00001ms" type="success"></el-alert>
+          </div>
           <el-empty description="输入搜索内容" v-if="!searchInput.length"></el-empty>
         </el-card>
       </el-col>
