@@ -5,10 +5,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.RestClients;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 
-import java.net.UnknownHostException;
 
 @Configuration
 public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
@@ -22,6 +23,11 @@ public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
                 .build();
 
         return RestClients.create(clientConfiguration).rest();
+    }
+
+    @Bean(name = { "elasticsearchOperations", "elasticsearchTemplate" })
+    public ElasticsearchOperations elasticsearchOperations(ElasticsearchConverter elasticsearchConverter) {
+        return new ElasticsearchRestTemplate(elasticsearchClient(), elasticsearchConverter);
     }
 
 }

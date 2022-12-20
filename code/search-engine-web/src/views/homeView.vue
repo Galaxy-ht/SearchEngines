@@ -25,7 +25,7 @@
           </div>
           <el-empty description="无" v-if="!messageList.length"></el-empty>
           <ul v-if="messageList.length" style="margin-left: 5px;">
-            <li style="width: 800px; min-height: 20px; max-height: 100px; text-align: left; overflow: hidden;
+            <li style="margin-top: 5px;, width: 800px; min-height: 20px; max-height: 100px; text-align: left; overflow: hidden;
             text-overflow: ellipsis;
             display:-webkit-box;
             -webkit-box-orient:vertical;
@@ -71,7 +71,7 @@
   }
 
   const go_push = url => {
-   window.open("https://" + url);
+   window.open(url);
   }
 </script>
 
