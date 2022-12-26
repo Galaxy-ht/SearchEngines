@@ -18,10 +18,12 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +34,9 @@ public class SearchController {
 
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @GetMapping("/search")
     public JSONObject getSearchResults(@RequestParam String keyword,
@@ -49,6 +54,16 @@ public class SearchController {
         nativeSearchQueryBuilder.withHighlightFields(field1, field2);
         nativeSearchQueryBuilder.withQuery(boolQueryBuilder);
 
+        try {
+            redisTemplate.opsForZSet().incrementScore("hotBar", keyword, 1.0);
+            redisTemplate.opsForList().remove("searchHistory", 1, keyword);
+            redisTemplate.opsForList().leftPush("searchHistory", keyword);
+            redisTemplate.opsForList().trim("searchHistory", 0, 4);
+            redisTemplate.expire("searchHistory", Duration.ofDays(15));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
 
         PageRequest pageRequest = PageRequest.of(page, size);
         nativeSearchQueryBuilder.withPageable(pageRequest);
