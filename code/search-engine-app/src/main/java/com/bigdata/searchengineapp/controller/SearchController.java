@@ -54,17 +54,6 @@ public class SearchController {
         nativeSearchQueryBuilder.withHighlightFields(field1, field2);
         nativeSearchQueryBuilder.withQuery(boolQueryBuilder);
 
-        try {
-            redisTemplate.opsForZSet().incrementScore("hotBar", keyword, 1.0);
-            redisTemplate.opsForList().remove("searchHistory", 1, keyword);
-            redisTemplate.opsForList().leftPush("searchHistory", keyword);
-            redisTemplate.opsForList().trim("searchHistory", 0, 4);
-            redisTemplate.expire("searchHistory", Duration.ofDays(15));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
         PageRequest pageRequest = PageRequest.of(page, size);
         nativeSearchQueryBuilder.withPageable(pageRequest);
         NativeSearchQuery nativeSearchQuery = nativeSearchQueryBuilder.build();
@@ -82,6 +71,17 @@ public class SearchController {
         JSONObject data = new JSONObject();
         data.put("data", searchMatches);
         data.put("total", count);
+
+        try {
+            redisTemplate.opsForZSet().incrementScore("hotBar", keyword, 1.0);
+            redisTemplate.opsForList().remove("searchHistory", 1, keyword);
+            redisTemplate.opsForList().leftPush("searchHistory", keyword);
+            redisTemplate.opsForList().trim("searchHistory", 0, 4);
+            redisTemplate.expire("searchHistory", Duration.ofDays(15));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
         return data;
     }
 
